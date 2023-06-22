@@ -38,7 +38,7 @@ class SymLFSR:
         if (len(start_state) != len(coefs_array)):
             raise Exception
     def next(self):
-        self.state = np.array([sp.trunc(poly, 2) for poly in np.dot(self.state, self.feedback_matrix)])
+        self.state = np.array([sp.Poly(poly, domain=sp.GF(2)) for poly in np.dot(self.state, self.feedback_matrix)])
 
 class SymLMcombiner:
     def __init__(self, LFSRs, projection_matrix, output_function):
@@ -49,10 +49,10 @@ class SymLMcombiner:
         self.monomials = {math.prod(comb): ''.join([sym.name for sym in comb]) for comb in combinations(self.state, 2)}
 
     def calculate_output(self):
-        output = sp.trunc(self.output_function(*np.dot(self.state, self.projection_matrix)), 2)
-        output = output.subs(self.monomials)
+        output = sp.Poly(self.output_function(*np.dot(self.state, self.projection_matrix)), domain=sp.GF(2))
+        #output = output.subs(self.monomials)
         return output
 
     def next(self):
-        self.state = np.array([sp.trunc(poly, 2) for poly in np.dot(self.state, self.feedback_matrix)])
+        self.state = np.array([sp.Poly(poly, domain=sp.GF(2)) for poly in np.dot(self.state, self.feedback_matrix)])
         return self.calculate_output()
